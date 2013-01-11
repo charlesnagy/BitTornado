@@ -72,7 +72,7 @@ class SingleDownload:
             2+int(4*self.measure.get_rate()/self.downloader.chunksize),
             (2*just_unchoked)+self.downloader.queue_limit() )
         if self.backlog > 50:
-            self.backlog = max(50, self.backlog * 0.075)
+            self.backlog = int(max(50, self.backlog * 0.075))
         return self.backlog
     
     def disconnected(self):
@@ -253,7 +253,11 @@ class SingleDownload:
         if self.choked:
             return
         shuffle(want)
-        del want[self.backlog - len(self.active_requests):]
+        try:
+            del want[int(self.backlog - len(self.active_requests)):]
+        except TypeError as e:
+            import logging
+            logging.warning('Type error: backlog is {backlog}'. format(backlog=self.backlog))
         self.active_requests.extend(want)
         for piece, begin, length in want:
             self.connection.send_request(piece, begin, length)
