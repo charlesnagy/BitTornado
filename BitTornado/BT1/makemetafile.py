@@ -6,7 +6,7 @@
 import os
 from threading import Event
 from traceback import print_exc
-from BTTree import Info, BTTree
+from BitTornado.BTTree import Info, BTTree
 
 defaults = [
     ('announce_list', '',
