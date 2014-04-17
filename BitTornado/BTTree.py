@@ -321,7 +321,9 @@ class BTTree:
         Parameters
             Info	info   - Info structure to update
         """
-        if self.subs == []:
+
+
+        if not os.path.isdir(self.loc) and self.subs == []:
             h = open(self.loc,'rb')
             pos = 0L
             info.add_file_info(self.size, self.path)
