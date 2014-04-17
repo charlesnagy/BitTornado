@@ -68,37 +68,30 @@ def make_meta_file(loc, url, params = {}, flag = Event(),
 
     info.write(tracker = url, **params)
 
-def completedir(dir, url, params = {}, flag = Event(),
+def completedir(directory, url, params = {}, flag = Event(),
                 vc = lambda x: None, fc = lambda x: None):
-    files = os.listdir(dir)
-    files.sort()
     ext = '.torrent'
     if params.has_key('target'):
         target = params['target']
     else:
         target = ''
 
-    togen = []
-    for f in files:
-        if f[-len(ext):] != ext and (f + ext) not in files:
-            togen.append(os.path.join(dir, f))
-
-    trees = [BTTree(loc,[]) for loc in togen]
+    trees = [BTTree(directory,[]), ]
     total = sum(tree.size for tree in trees)
         
     subtotal = [0]
     def callback(x, subtotal = subtotal, total = total, vc = vc):
         subtotal[0] += x
         vc(float(subtotal[0]) / total)
-    for i in togen:
-        fc(i)
-        try:
-            t = os.path.split(i)[-1]
-            if t not in ignore and t[0] != '.':
-                subparams = params.copy()
-                if target != '':
-                    subparams['target'] = os.path.join(target,t+ext)
-                make_meta_file(i, url, subparams, flag,
-                    progress = callback, progress_percent = False)
-        except ValueError:
-            print_exc()
+
+    fc(directory)
+    try:
+        t = os.path.split(directory)[-1]
+        if t not in ignore and t[0] != '.':
+            subparams = params.copy()
+            if target != '':
+                subparams['target'] = os.path.join(target,t+ext)
+            make_meta_file(directory, url, subparams, flag,
+                progress = callback, progress_percent = False)
+    except ValueError:
+        print_exc()
